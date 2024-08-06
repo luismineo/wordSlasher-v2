@@ -1,0 +1,29 @@
+import '../style.css'
+import Phaser, { CANVAS } from 'phaser'
+import GameScene from './scenes/GameScene'
+
+const res = {
+    width: 1280,
+    height: 720
+  }
+
+const config = {
+    type: Phaser.AUTO,
+    width: res.width,
+    height: res.height,
+    parent: 'gameDiv',
+    scene: [GameScene],
+    physics: {
+      default: "arcade",
+      arcade: {
+        gravity: {y: 0},
+        debug: true
+      }
+    },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    }
+  }
+
+  new Phaser.Game(config)
