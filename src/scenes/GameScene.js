@@ -53,9 +53,13 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
+        //Reset the game for new playthroughs
+        this.resetGame();
+
+        // Consts for center some text
         const { width, height } = this.sys.game.config;
 
-        // Game scene setup
+        // // Game scene setup // //
 
         // Render background, center and scale to window size
         const background = this.add.image(0, 0, 'town_red');
@@ -162,7 +166,8 @@ export default class GameScene extends Phaser.Scene {
 
             // Condition to damage player - TODO - change this to collision with crystal
             if (enemy.x > 1260) {
-                this.damagePlayer(10);
+                this.damageStat = enemy.isHard ? 20 : 10; // Change damage output based on type of enemy
+                this.damagePlayer(this.damageStat);
                 enemy.wordContainer.destroy();
                 enemy.destroy();
             }
@@ -174,11 +179,6 @@ export default class GameScene extends Phaser.Scene {
 
         // Check for game over
         if (this.playerHealth <= 0) {
-            // This is GAMBIARRA to destroy all enemies in game over
-            this.enemies.children.entries.forEach(enemy => {
-                enemy.wordContainer.destroy();
-                enemy.destroy();
-            });
             this.gameOver();
         }
     }
@@ -249,7 +249,8 @@ export default class GameScene extends Phaser.Scene {
                 this.activeWords.delete(enemy.word); // Remove the word from the list to allow new enemies with this word
                 enemy.wordContainer.destroy(); // Destroy enemy word from the scene
                 enemy.destroy(); // Destroy enemy from the scene
-                this.score += 10;
+                this.points = enemy.isHard ? 30 : 10; // Change points gained based on type of enemy
+                this.score += this.points;
                 this.scoreText.setText('Score: ' + this.score);
                 this.currentWord = '';
                 this.wordText.setText(this.currentWord);
@@ -303,7 +304,7 @@ export default class GameScene extends Phaser.Scene {
         // Mini boss has more speed to provide more challenge
         enemy.speed = isMiniBoss ? Phaser.Math.Between(4, 5) : Phaser.Math.Between(1, 3);
         enemy.word = this.getRandomWord(isMiniBoss);
-        enemy.isHard = isMiniBoss;
+        enemy.isHard = isMiniBoss; // Property to help define different game logic for mini bosses outside the scope of this function
 
         // Different text style for mini boss
         const textStyle = {
@@ -338,8 +339,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     getRandomWord(isMiniBoss = false) {
-        const basicWords = ['phaser', 'javascript', 'typing', 'game', 'enemy', 'crystal', 'score', 'health', 'speed', 'word'];
-        const hardWords = ['programming', 'development', 'application', 'interactive', 'challenging', 'difficulty', 'experience', 'performance'];
+        const basicWords = ['casa', 'mesa', 'cachorro', 'gato', 'carro', 'flor', 'sol', 'chuva', 'nuvem', 'livro', 'bola', 'porta', 'jardim', 'rio', 'arvore'];
+        const hardWords = ['transcendental', 'inconstitucional', 'paralelepipedo', 'contrarrevolucionario', 'psicossomatico', 'democratizacao', 'obnubilado', 'substantivo', 'transcendencia', 'metalinguagem'];
 
         const words = isMiniBoss ? hardWords : basicWords;
         let newWord;
@@ -376,18 +377,45 @@ export default class GameScene extends Phaser.Scene {
         // Should destroy all enemies and the crystal, but it is not working properly - TODO - fix this
         this.enemies.children.entries.forEach(enemy => {
             enemy.wordContainer.destroy();
-            enemy.destroy();
         });
 
         // Play the crystal destruction animation
         this.playCrystalDestruction();
 
         this.time.delayedCall(2000, () => {
-            this.enemies.clear(true, true);
+            // this.enemies.clear(true, true); // To clear enemies from screen, but keeping them is charming
             this.crystal.destroy();
             this.necromancerHeroe.destroy();
             this.add.text(640, 360, 'Game Over', { fontSize: '64px', fontStyle: 'bold', fill: '#ff0000' }).setOrigin(0.5);
             this.add.text(640, 410, 'Final Score: ' + this.score, { fontSize: '32px', fontStyle: 'bold', fill: '#fff' }).setOrigin(0.5);
+
+            const tryAgainButton = this.add.text(640, 460, 'Tentar novamente', { fontSize: '32px', fontStyle: 'bold', fill: '#fff' })
+                                    .setOrigin(0.5).setInteractive({useHandCursor: true}).on('pointerdown', () => {
+                                        this.scene.restart();
+                                    });
+
+            [tryAgainButton].forEach(button => {
+                button.on('pointerover', () => button.setStyle({fill: '#ff0'}));
+                button.on('pointerout', () => button.setStyle({fill: '#fff'}));
+            });
         });
+    }
+
+    resetGame() {
+        if(this.enemies){
+            this.enemies.clear(true, true);
+        }
+        this.enemies = null;
+        this.crystal = null;
+        this.necromancerHeroe = null;
+        this.score = 0;
+        this.scoreText = null;
+        this.currentWord = '';
+        this.wordText = null;
+        this.playerHealth = 100;
+        this.healthBar = null;
+        this.currentEnemy = null;
+        this.activeWords = new Set();
+        this.gameOverState = false;
     }
 }
