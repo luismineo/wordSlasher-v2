@@ -3,11 +3,13 @@ import Phaser from 'phaser';
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
+        this.gameOverState = false;
     }
 
     init() {
         this.enemies = null;
         this.crystal = null;
+        this.necromancerHeroe = null;
         this.score = 0;
         this.scoreText = null;
         this.currentWord = '';
@@ -21,39 +23,106 @@ export default class GameScene extends Phaser.Scene {
     preload() {
         this.load.image('background', 'assets/background.png');
         this.load.image('enemy', 'assets/wizard.png');
-        this.load.spritesheet('crystal', 'assets/crystal.png', {frameWidth:32, frameHeight: 32});
-        
+        this.load.image('city', 'assets/levels/city_day.png');
+        this.load.image('town', 'assets/levels/night_town.png');
+        this.load.image('town_red', 'assets/levels/town_red.png');
+        this.load.image('graveyard', 'assets/levels/graveyard.png');
+        this.load.spritesheet('crystal', 'assets/objectives/crystal.png', {frameWidth:64, frameHeight: 64});
+        this.load.spritesheet('crystal_r', 'assets/objectives/red_crystal.png', {frameWidth:64, frameHeight: 64});
+        this.load.spritesheet('crystal_r_d', 'assets/objectives/red_crystal_destr.png', {frameWidth:64, frameHeight: 64});
+        this.load.spritesheet('demon', 'assets/enemies/demon-idle.png', {frameWidth:160, frameHeight: 144});
+        this.load.spritesheet('skull', 'assets/enemies/fire-skull.png', {frameWidth:96, frameHeight: 112});
+        this.load.spritesheet('necromancer_i', 'assets/heroes/necro_idle.png', {frameWidth:160, frameHeight: 160});
+        this.load.spritesheet('necromancer_a', 'assets/heroes/necro_attack.png', {frameWidth:160, frameHeight: 160});
+
         // Filter to scale sprites without blur
         this.load.once('complete', () => {
-            this.textures.get('background').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('city').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('town').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('town_red').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('graveyard').setFilter(Phaser.Textures.FilterMode.NEAREST);
             this.textures.get('enemy').setFilter(Phaser.Textures.FilterMode.NEAREST);
             this.textures.get('crystal').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('crystal_r').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('crystal_r_d').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('demon').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('skull').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('necromancer_i').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('necromancer_a').setFilter(Phaser.Textures.FilterMode.NEAREST);
         })
     }
 
     create() {
         const { width, height } = this.sys.game.config;
-        
-        // Game scene setup
-        
-        // Render background, center and scale to window size
-        const background = this.add.image(0, 0, 'background');
-        background.setOrigin(0, 0); 
-        background.displayWidth = width; 
-        background.displayHeight = height; 
-    
-        // Crystal animation
-        const animConfig = {
-            key: 'idle',
-            frames: this.anims.generateFrameNumbers('crystal'),
-            frameRate: 8,
-            yoyo: true,
-            repeat: -1
-        }
 
-        this.anim = this.anims.create(animConfig);
-        this.sprite = this.add.sprite(1200, 300, 'crystal').setScale(8);
-        this.sprite.anims.play('idle');
+        // Game scene setup
+
+        // Render background, center and scale to window size
+        const background = this.add.image(0, 0, 'town_red');
+        background.setOrigin(0, 0);
+        background.displayWidth = width;
+        background.displayHeight = height;
+
+        // Demon animation
+        this.anims.create({
+            key: 'demon-idle',
+            frames: this.anims.generateFrameNumbers('demon'),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        // Skull animation
+        this.anims.create({
+            key: 'skull-idle',
+            frames: this.anims.generateFrameNumbers('skull'),
+            frameRate: 8,
+            repeat: -1
+        });
+
+
+        // Crystal animation
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('crystal_r'),
+            frameRate: 8,
+            // yoyo: true,
+            repeat: -1
+        })
+
+        // Crystal animation destroyed
+        this.anims.create({
+            key: 'crystal-destroyed',
+            frames: this.anims.generateFrameNumbers('crystal_r_d'),
+            frameRate: 8,
+            repeat: 0
+        })
+
+        // Necromancer animation idle
+        this.anims.create({
+            key: 'necro-idle',
+            frames: this.anims.generateFrameNumbers('necromancer_i', { start: 0, end: 7 }),
+            frameRate: 8,
+            repeat: -1
+        })
+
+        // Necromancer animation attacking
+        this.anims.create({
+            key: 'necro-attack',
+            frames: this.anims.generateFrameNumbers('necromancer_a'),
+            frameRate: 16,
+            repeat: 0
+        })
+
+        // Necromancer sprite
+        this.necromancerHeroe = this.add.sprite(1100, 200, 'necromancer_i');
+        this.necromancerHeroe.setScale(3.5);
+        this.necromancerHeroe.flipX = true;
+        this.necromancerHeroe.play('necro-idle');
+
+        // Crystal sprite
+        this.crystal = this.add.sprite(1100, 450, 'crystal_r');
+        this.crystal.setScale(4);
+        this.crystal.play('idle');
 
         // Set up enemy group
         this.enemies = this.physics.add.group();
@@ -72,11 +141,16 @@ export default class GameScene extends Phaser.Scene {
         // Set up keyboard input
         this.input.keyboard.on('keydown', this.handleKeyPress, this);
 
-        // Timer for spawning enemies, TODO - change this logic to set dificulty levels
+        // Timer for spawning enemies - TODO - change this logic to set dificulty levels
         this.time.addEvent({ delay: 2000, callback: this.spawnEnemy, callbackScope: this, loop: true });
     }
 
     update() {
+        if (this.gameOverState) {
+            // Don't update game logic in game over state
+            return;
+        }
+
         if (this.currentEnemy && !this.currentEnemy.active) {
             this.resetCurrentEnemy();
         }
@@ -86,7 +160,7 @@ export default class GameScene extends Phaser.Scene {
             enemy.x += enemy.speed;
             enemy.wordContainer.x = enemy.x;
 
-            // Condition to damage player, TODO - change this to collision with crystal
+            // Condition to damage player - TODO - change this to collision with crystal
             if (enemy.x > 1260) {
                 this.damagePlayer(10);
                 enemy.wordContainer.destroy();
@@ -100,6 +174,11 @@ export default class GameScene extends Phaser.Scene {
 
         // Check for game over
         if (this.playerHealth <= 0) {
+            // This is GAMBIARRA to destroy all enemies in game over
+            this.enemies.children.entries.forEach(enemy => {
+                enemy.wordContainer.destroy();
+                enemy.destroy();
+            });
             this.gameOver();
         }
     }
@@ -107,16 +186,26 @@ export default class GameScene extends Phaser.Scene {
     updateEnemyHighlight() {
         // Check each enemy, then loops through his word, if match with the typed letter, highlight in green
         this.enemies.children.entries.forEach(enemy => {
-            for (let i = 0; i < enemy.word.length; i++) {
-                if (i < this.currentWord.length && this.currentWord[i] === enemy.word[i]) {
-                    enemy.wordChars[i].setColor('#00ff00');
-                } else {
-                    enemy.wordChars[i].setColor('#fff');
+            if(enemy.isHard){
+                for (let i = 0; i < enemy.word.length; i++) {
+                    if (i < this.currentWord.length && this.currentWord[i] === enemy.word[i]) {
+                        enemy.wordChars[i].setColor('#00ff00');
+                    } else {
+                        enemy.wordChars[i].setColor('#ff0000');
+                    }
+                }
+            } else{
+                for (let i = 0; i < enemy.word.length; i++) {
+                    if (i < this.currentWord.length && this.currentWord[i] === enemy.word[i]) {
+                        enemy.wordChars[i].setColor('#00ff00');
+                    } else {
+                        enemy.wordChars[i].setColor('#fff');
+                    }
                 }
             }
         });
     }
-    
+
     handleKeyPress(event) {
         // Check for player typing
         if (event.key.length === 1 && event.key.match(/[a-z]/i)) {
@@ -132,10 +221,10 @@ export default class GameScene extends Phaser.Scene {
             }
         }
     }
-    
+
     checkLetter(pressedKey) {
         let matchFound = false; // To check if the letter correspond to any enemy
-        this.enemies.children.entries.forEach(enemy => { 
+        this.enemies.children.entries.forEach(enemy => {
             if (enemy.word.startsWith(this.currentWord)) { // Loops through each enemy checking the first letter
                 const currentIndex = this.currentWord.length - 1;
                 if (enemy.word[currentIndex] === pressedKey) {
@@ -144,16 +233,16 @@ export default class GameScene extends Phaser.Scene {
                 }
             }
         });
-    
+
         if (!matchFound) { // Reset current word, if ther is a missmatch in player's input
             this.currentWord = '';
             this.wordText.setText(this.currentWord);
             this.updateEnemyHighlight();
         }
-    
+
         this.checkWord(); // First check letter, then call check word
     }
-    
+
     checkWord() {
         this.enemies.children.entries.forEach(enemy => {
             if (enemy.word === this.currentWord) { // Logic to destroy enemies if current word match the enemy word
@@ -164,8 +253,29 @@ export default class GameScene extends Phaser.Scene {
                 this.scoreText.setText('Score: ' + this.score);
                 this.currentWord = '';
                 this.wordText.setText(this.currentWord);
+
+                // Play the attack animation
+                this.playNecromancerAttack();
             }
         });
+    }
+
+    playNecromancerAttack() {
+        // Stop the idle animation and play the attack animation
+        this.necromancerHeroe.stop();
+        this.necromancerHeroe.play('necro-attack');
+
+        // After the attack animation completes, return to idle
+        this.necromancerHeroe.once('animationcomplete', () => {
+            this.necromancerHeroe.stop();
+            this.necromancerHeroe.play('necro-idle');
+        });
+    }
+
+    playCrystalDestruction() {
+        // Stop the idle animation and play the destruction animation
+        this.crystal.stop();
+        this.crystal.play('crystal-destroyed');
     }
 
     resetCurrentEnemy() {
@@ -179,51 +289,69 @@ export default class GameScene extends Phaser.Scene {
         this.currentWord = '';
         this.wordText.setText(this.currentWord);
     }
-    
+
     spawnEnemy() {
+        const isMiniBoss = Math.random() < 0.3; // 30% chance for a hard enemy
+        const enemyType = isMiniBoss ? 'demon' : 'skull';
+
         // Define new enemy and new word
-        const enemy = this.enemies.create(0, Phaser.Math.Between(100, 500), 'enemy').setScale(2);
-        enemy.speed = Phaser.Math.Between(1, 3);
-        enemy.word = this.getRandomWord();
-        
+        const enemy = this.enemies.create(0, Phaser.Math.Between(150, 550), enemyType);
+        enemy.flipX = true;
+        enemy.setScale(isMiniBoss ? 2 : 0.8);
+        enemy.play(enemyType + '-idle');
+
+        // Mini boss has more speed to provide more challenge
+        enemy.speed = isMiniBoss ? Phaser.Math.Between(4, 5) : Phaser.Math.Between(1, 3);
+        enemy.word = this.getRandomWord(isMiniBoss);
+        enemy.isHard = isMiniBoss;
+
+        // Different text style for mini boss
+        const textStyle = {
+            fontSize: isMiniBoss ? '36px' : '32px',
+            fontStyle: 'bold',
+            fill: isMiniBoss ? '#ff0000' : '#fff'
+        };
+
         // Create text objects for each character
         enemy.wordChars = enemy.word.split('').map((char) => {
-            return this.add.text(0, 0, char, { fontSize: '32px', fontStyle: 'bold', fill: '#fff' });
+            return this.add.text(0, 0, char, textStyle);
         });
-    
+
         // Create a container for the word characters
         enemy.wordContainer = this.add.container(enemy.x, enemy.y - 80, enemy.wordChars);
-    
+
         // Calculate the total width of the word container
         const totalWidth = enemy.wordChars.reduce((width, char) => width + char.width, 0);
         const totalHeight = enemy.wordChars[0].height;
-    
+
         // Set the size of the container
         enemy.wordContainer.setSize(totalWidth, totalHeight);
-    
+
         // Center the text within the container
         Phaser.Actions.SetXY(enemy.wordChars, -totalWidth / 2, 0, totalWidth / enemy.word.length);
-    
+
         // Update the position of the container to center it relative to the enemy sprite
         enemy.wordContainer.setPosition(enemy.x - totalWidth / 2, enemy.y - 80);
-    
+
         // Initialize the next character index
         enemy.nextCharIndex = 0;
     }
-    
 
-    getRandomWord() {
-        const words = ['phaser', 'javascript', 'typing', 'game', 'enemy', 'crystal', 'score', 'health', 'speed', 'word'];
+    getRandomWord(isMiniBoss = false) {
+        const basicWords = ['phaser', 'javascript', 'typing', 'game', 'enemy', 'crystal', 'score', 'health', 'speed', 'word'];
+        const hardWords = ['programming', 'development', 'application', 'interactive', 'challenging', 'difficulty', 'experience', 'performance'];
+
+        const words = isMiniBoss ? hardWords : basicWords;
         let newWord;
         do {
             newWord = words[Phaser.Math.Between(0, words.length - 1)];
         } while (this.activeWords.has(newWord) && this.activeWords.size < words.length);
-    
+
         // If all words are used, clear the set and start over
         if (this.activeWords.size >= words.length) {
             this.activeWords.clear();
         }
-        
+
         this.activeWords.add(newWord);
         return newWord;
     }
@@ -231,7 +359,7 @@ export default class GameScene extends Phaser.Scene {
     damagePlayer(amount) {
         this.playerHealth -= amount;
         if (this.playerHealth < 0) this.playerHealth = 0;
-        
+
         // Remove the word of the enemy that reached the end
         const enemyReachedEnd = this.enemies.children.entries.find(enemy => enemy.x > 1260);
         if (enemyReachedEnd) {
@@ -240,13 +368,26 @@ export default class GameScene extends Phaser.Scene {
     }
 
     gameOver() {
+        this.gameOverState = true;
+
+        // Stop the spawn timer
+        this.time.removeAllEvents();
+
+        // Should destroy all enemies and the crystal, but it is not working properly - TODO - fix this
         this.enemies.children.entries.forEach(enemy => {
             enemy.wordContainer.destroy();
             enemy.destroy();
         });
 
-        this.scene.pause();
-        this.add.text(640, 360, 'Game Over', { fontSize: '64px', fontStyle: 'bold', fill: '#ff0000' }).setOrigin(0.5);
-        this.add.text(640, 410, 'Final Score: ' + this.score, { fontSize: '32px', fontStyle: 'bold', fill: '#fff' }).setOrigin(0.5);
+        // Play the crystal destruction animation
+        this.playCrystalDestruction();
+
+        this.time.delayedCall(2000, () => {
+            this.enemies.clear(true, true);
+            this.crystal.destroy();
+            this.necromancerHeroe.destroy();
+            this.add.text(640, 360, 'Game Over', { fontSize: '64px', fontStyle: 'bold', fill: '#ff0000' }).setOrigin(0.5);
+            this.add.text(640, 410, 'Final Score: ' + this.score, { fontSize: '32px', fontStyle: 'bold', fill: '#fff' }).setOrigin(0.5);
+        });
     }
 }
