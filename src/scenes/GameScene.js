@@ -40,6 +40,9 @@ export default class GameScene extends Phaser.Scene {
         this.load.spritesheet('skull', 'assets/enemies/fire-skull.png', {frameWidth:96, frameHeight: 112});
         this.load.spritesheet('necromancer_i', 'assets/heroes/necro_idle.png', {frameWidth:160, frameHeight: 160});
         this.load.spritesheet('necromancer_a', 'assets/heroes/necro_attack.png', {frameWidth:160, frameHeight: 160});
+        this.load.spritesheet('red_fx', 'assets/fx/13_vortex_spritesheet.png', {frameWidth:100, frameHeight: 100});
+        this.load.spritesheet('magic', 'assets/fx/6_flamelash_spritesheet.png', {frameWidth:100, frameHeight: 100});
+        this.load.spritesheet('fire_fx', 'assets/fx/Rocket Fire 2-Sheet.png', {frameWidth:150, frameHeight: 150});
 
         // Filter to scale sprites without blur
         this.load.once('complete', () => {
@@ -55,6 +58,9 @@ export default class GameScene extends Phaser.Scene {
             this.textures.get('skull').setFilter(Phaser.Textures.FilterMode.NEAREST);
             this.textures.get('necromancer_i').setFilter(Phaser.Textures.FilterMode.NEAREST);
             this.textures.get('necromancer_a').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('red_fx').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('magic').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('fire_fx').setFilter(Phaser.Textures.FilterMode.NEAREST);
         })
     }
 
@@ -125,6 +131,23 @@ export default class GameScene extends Phaser.Scene {
             repeat: 0
         })
 
+        // Death animation
+        this.anims.create({
+            key: 'fire_fx',
+            frames: this.anims.generateFrameNumbers('fire_fx'),
+            frameRate: 32,
+            // yoyo: true,
+            repeat: 0
+        })
+
+        // Magic animation
+        this.anims.create({
+            key: 'magic',
+            frames: this.anims.generateFrameNumbers('magic'),
+            frameRate: 64,
+            repeat: 0
+        })
+
         // Necromancer sprite
         this.necromancerHeroe = this.add.sprite(1100, 200, 'necromancer_i');
         this.necromancerHeroe.setScale(3.5);
@@ -177,6 +200,7 @@ export default class GameScene extends Phaser.Scene {
                 this.damageStat = enemy.isHard ? 20 : 10; // Change damage output based on type of enemy
                 this.damagePlayer(this.damageStat);
                 enemy.wordContainer.destroy();
+                this.damageFX(enemy.x, enemy.y);
                 enemy.destroy();
             }
         });
@@ -256,6 +280,7 @@ export default class GameScene extends Phaser.Scene {
             if (enemy.word === this.currentWord) { // Logic to destroy enemies if current word match the enemy word
                 this.activeWords.delete(enemy.word); // Remove the word from the list to allow new enemies with this word
                 enemy.wordContainer.destroy(); // Destroy enemy word from the scene
+                this.deathFX(enemy.x, enemy.y); // Play FX on enemy kill
                 enemy.destroy(); // Destroy enemy from the scene
                 this.points = enemy.isHard ? 30 : 10; // Change points gained based on type of enemy
                 this.score += this.points;
@@ -381,6 +406,26 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
+    deathFX(enemyX, enemyY) {
+        const deathParticle = this.add.sprite(enemyX, enemyY, 'magic').setScale(4);
+        deathParticle.play('magic');
+
+        deathParticle.once('animationcomplete', () => {
+            deathParticle.destroy();
+        });
+    }
+
+    damageFX(enemyX, enemyY) {
+        const deathParticle = this.add.sprite(enemyX, enemyY, 'fire_fx').setScale(4);
+        deathParticle.angle = 90;
+        deathParticle.play('fire_fx');
+
+        deathParticle.once('animationcomplete', () => {
+            deathParticle.destroy();
+        });
+    }
+
+
     gameOver() {
         this.gameOverState = true;
 
@@ -396,7 +441,10 @@ export default class GameScene extends Phaser.Scene {
         this.playCrystalDestruction();
 
         this.time.delayedCall(2000, () => {
-            // this.enemies.clear(true, true); // To clear enemies from screen, but keeping them is charming
+            const graphics = this.add.graphics();
+            graphics.fillStyle(0x000000, 0.5);
+            graphics.fillRect(0, 0, 1280, 720);
+
             this.crystal.destroy();
             this.necromancerHeroe.destroy();
             this.add.text(640, 310, 'Game Over', { fontSize: '128px', fontFamily: 'hexenaat', fill: '#ff0000' }).setOrigin(0.5);
@@ -405,6 +453,7 @@ export default class GameScene extends Phaser.Scene {
             const tryAgainButton = this.add.text(640, 480, 'Tentar novamente', { fontSize: '32px', fontFamily: 'hexenaat', fill: '#fff' })
                                     .setOrigin(0.5).setInteractive({useHandCursor: true}).on('pointerdown', () => {
                                         this.scene.restart();
+                                        graphics.destroy();
                                     });
 
             const backMainMenu = this.add.text(640, 530, 'Voltar ao menu', { fontSize: '32px', fontFamily: 'hexenaat', fill: '#fff' })
@@ -413,7 +462,7 @@ export default class GameScene extends Phaser.Scene {
                                     });
 
             [tryAgainButton, backMainMenu].forEach(button => {
-                button.on('pointerover', () => button.setStyle({fill: '#ff0'}));
+                button.on('pointerover', () => button.setStyle({fill: '#ff0000'}));
                 button.on('pointerout', () => button.setStyle({fill: '#fff'}));
             });
         });
