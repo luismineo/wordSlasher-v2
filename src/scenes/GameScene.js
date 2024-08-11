@@ -42,7 +42,9 @@ export default class GameScene extends Phaser.Scene {
         this.load.spritesheet('necromancer_a', 'assets/heroes/necro_attack.png', {frameWidth:160, frameHeight: 160});
         this.load.spritesheet('red_fx', 'assets/fx/13_vortex_spritesheet.png', {frameWidth:100, frameHeight: 100});
         this.load.spritesheet('magic', 'assets/fx/6_flamelash_spritesheet.png', {frameWidth:100, frameHeight: 100});
-        this.load.spritesheet('fire_fx', 'assets/fx/Rocket Fire 2-Sheet.png', {frameWidth:150, frameHeight: 150});
+        this.load.spritesheet('fire_fx', 'assets/fx/Rocket_Fire_2-Sheet.png', {frameWidth:150, frameHeight: 150})
+        this.load.spritesheet('flame', 'assets/fx/flame_attack.png', {frameWidth:64, frameHeight: 64});
+        this.load.spritesheet('hex_flame', 'assets/fx/hex_flame.png', {frameWidth:64, frameHeight: 64});
 
         // Filter to scale sprites without blur
         this.load.once('complete', () => {
@@ -61,6 +63,8 @@ export default class GameScene extends Phaser.Scene {
             this.textures.get('red_fx').setFilter(Phaser.Textures.FilterMode.NEAREST);
             this.textures.get('magic').setFilter(Phaser.Textures.FilterMode.NEAREST);
             this.textures.get('fire_fx').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('flame').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('hex_flame').setFilter(Phaser.Textures.FilterMode.NEAREST);
         })
     }
 
@@ -145,6 +149,28 @@ export default class GameScene extends Phaser.Scene {
             key: 'magic',
             frames: this.anims.generateFrameNumbers('magic'),
             frameRate: 64,
+            repeat: 0
+        })
+
+        // Magic animation
+        this.anims.create({
+            key: 'flame',
+            frames: this.anims.generateFrameNames('flame', {
+                start: 105,
+                end: 119
+            }),
+            frameRate: 32,
+            repeat: 0
+        })
+
+        // Magic animation
+        this.anims.create({
+            key: 'hex_flame',
+            frames: this.anims.generateFrameNames('hex_flame', {
+                start: 112,
+                end: 127
+            }),
+            frameRate: 32,
             repeat: 0
         })
 
@@ -352,7 +378,7 @@ export default class GameScene extends Phaser.Scene {
         });
 
         // Create a container for the word characters
-        enemy.wordContainer = this.add.container(enemy.x, enemy.y - 80, enemy.wordChars);
+        enemy.wordContainer = this.add.container(enemy.x, enemy.y, enemy.wordChars);
 
         // Calculate the total width of the word container
         const totalWidth = enemy.wordChars.reduce((width, char) => width + char.width, 0);
@@ -365,7 +391,7 @@ export default class GameScene extends Phaser.Scene {
         Phaser.Actions.SetXY(enemy.wordChars, -totalWidth / 2, 0, totalWidth / enemy.word.length);
 
         // Update the position of the container to center it relative to the enemy sprite
-        enemy.wordContainer.setPosition(enemy.x - totalWidth / 2, enemy.y - 80);
+        enemy.wordContainer.setPosition(enemy.x - totalWidth / 2, isMiniBoss ? enemy.y - 130 : enemy.y - 80);
 
         // Initialize the next character index
         enemy.nextCharIndex = 0;
@@ -407,8 +433,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     deathFX(enemyX, enemyY) {
-        const deathParticle = this.add.sprite(enemyX, enemyY, 'magic').setScale(4);
-        deathParticle.play('magic');
+        const deathParticle = this.add.sprite(enemyX, enemyY, 'hex_flame').setScale(4);
+        deathParticle.play('hex_flame');
 
         deathParticle.once('animationcomplete', () => {
             deathParticle.destroy();
