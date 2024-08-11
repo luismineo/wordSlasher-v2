@@ -1,6 +1,7 @@
 import '../style.css'
 import Phaser, { CANVAS } from 'phaser'
 import GameScene from './scenes/GameScene'
+import MainMenu from './scenes/MainMenu'
 
 const res = {
     width: 1280,
@@ -12,7 +13,7 @@ const config = {
     width: res.width,
     height: res.height,
     parent: 'gameDiv',
-    scene: [GameScene],
+    scene: [MainMenu, GameScene],
     physics: {
       default: "arcade",
       arcade: {

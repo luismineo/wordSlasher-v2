@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import MainMenu from './MainMenu';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -21,8 +22,13 @@ export default class GameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('background', 'assets/background.png');
-        this.load.image('enemy', 'assets/wizard.png');
+        this.loadFont("hexenaat", "assets/fonts/Hexenaat2.ttf");
+        this.loadFont("dotgothic", "assets/fonts/DotGothic16-Regular.ttf");
+        this.loadFont("vt323", "assets/fonts/VT323-Regular.ttf");
+        this.loadFont("zai", "assets/fonts/zai_TributeToCaselli'sPantelegraph.ttf");
+
+        this.load.image('background', 'assets/old/background.png');
+        this.load.image('enemy', 'assets/old/wizard.png');
         this.load.image('city', 'assets/levels/city_day.png');
         this.load.image('town', 'assets/levels/night_town.png');
         this.load.image('town_red', 'assets/levels/town_red.png');
@@ -53,6 +59,8 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.cameras.main.fadeIn(500, 0, 0, 0);
+
         //Reset the game for new playthroughs
         this.resetGame();
 
@@ -132,7 +140,7 @@ export default class GameScene extends Phaser.Scene {
         this.enemies = this.physics.add.group();
 
         // Display score
-        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px',fontStyle: 'bold', fill: '#fff' });
+        this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '64px', fontFamily: 'hexenaat', fill: '#fff' });
 
         // Display current word being typed
         this.wordText = this.add.text(640, 620, '', { fontSize: '32px', fill: '#fff' });
@@ -302,14 +310,14 @@ export default class GameScene extends Phaser.Scene {
         enemy.play(enemyType + '-idle');
 
         // Mini boss has more speed to provide more challenge
-        enemy.speed = isMiniBoss ? Phaser.Math.Between(4, 5) : Phaser.Math.Between(1, 3);
+        enemy.speed = isMiniBoss ? Phaser.Math.Between(1, 3)/2 : Phaser.Math.Between(1, 2)/2;
         enemy.word = this.getRandomWord(isMiniBoss);
         enemy.isHard = isMiniBoss; // Property to help define different game logic for mini bosses outside the scope of this function
 
         // Different text style for mini boss
         const textStyle = {
-            fontSize: isMiniBoss ? '36px' : '32px',
-            fontStyle: 'bold',
+            fontSize: isMiniBoss ? '64px' : '64px',
+            fontFamily: 'vt323',
             fill: isMiniBoss ? '#ff0000' : '#fff'
         };
 
@@ -336,6 +344,11 @@ export default class GameScene extends Phaser.Scene {
 
         // Initialize the next character index
         enemy.nextCharIndex = 0;
+
+        // Debugging info
+        console.log(enemy.isHard);
+        console.log(enemy.speed);
+        console.log(enemy.word);
     }
 
     getRandomWord(isMiniBoss = false) {
@@ -386,15 +399,20 @@ export default class GameScene extends Phaser.Scene {
             // this.enemies.clear(true, true); // To clear enemies from screen, but keeping them is charming
             this.crystal.destroy();
             this.necromancerHeroe.destroy();
-            this.add.text(640, 360, 'Game Over', { fontSize: '64px', fontStyle: 'bold', fill: '#ff0000' }).setOrigin(0.5);
-            this.add.text(640, 410, 'Final Score: ' + this.score, { fontSize: '32px', fontStyle: 'bold', fill: '#fff' }).setOrigin(0.5);
+            this.add.text(640, 310, 'Game Over', { fontSize: '128px', fontFamily: 'hexenaat', fill: '#ff0000' }).setOrigin(0.5);
+            this.add.text(640, 400, 'Final Score: ' + this.score, { fontSize: '64px', fontFamily: 'hexenaat', fill: '#fff' }).setOrigin(0.5);
 
-            const tryAgainButton = this.add.text(640, 460, 'Tentar novamente', { fontSize: '32px', fontStyle: 'bold', fill: '#fff' })
+            const tryAgainButton = this.add.text(640, 480, 'Tentar novamente', { fontSize: '32px', fontFamily: 'hexenaat', fill: '#fff' })
                                     .setOrigin(0.5).setInteractive({useHandCursor: true}).on('pointerdown', () => {
                                         this.scene.restart();
                                     });
 
-            [tryAgainButton].forEach(button => {
+            const backMainMenu = this.add.text(640, 530, 'Voltar ao menu', { fontSize: '32px', fontFamily: 'hexenaat', fill: '#fff' })
+                                    .setOrigin(0.5).setInteractive({useHandCursor: true}).on('pointerdown', () => {
+                                        location.reload(); // GAMBIARRA to reload the page and reset the game
+                                    });
+
+            [tryAgainButton, backMainMenu].forEach(button => {
                 button.on('pointerover', () => button.setStyle({fill: '#ff0'}));
                 button.on('pointerout', () => button.setStyle({fill: '#fff'}));
             });
@@ -417,5 +435,14 @@ export default class GameScene extends Phaser.Scene {
         this.currentEnemy = null;
         this.activeWords = new Set();
         this.gameOverState = false;
+    }
+
+     loadFont(name, url) {
+        var newFont = new FontFace(name, `url(${url})`);
+        newFont.load().then(function (loaded) {
+            document.fonts.add(loaded);
+        }).catch(function (error) {
+            return error;
+        });
     }
 }
