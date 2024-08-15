@@ -313,9 +313,22 @@ export default class GameScene extends Phaser.Scene {
                 this.scoreText.setText('Score: ' + this.score);
                 this.currentWord = '';
                 this.wordText.setText(this.currentWord);
+                this.resetAllHighlight();
 
                 // Play the attack animation
                 this.playNecromancerAttack();
+            }
+        });
+    }
+
+    resetAllHighlight(){ // Resets all highlighting of enemies
+        this.enemies.children.entries.forEach(enemy => {
+            for (let i = 0; i < enemy.word.length; i++){
+                if(enemy.isHard){
+                    enemy.wordChars[i].setColor('#ff0000')
+                }else {
+                    enemy.wordChars[i].setColor('#fff');
+                }
             }
         });
     }
@@ -361,7 +374,7 @@ export default class GameScene extends Phaser.Scene {
         enemy.play(enemyType + '-idle');
 
         // Mini boss has more speed to provide more challenge
-        enemy.speed = isMiniBoss ? Phaser.Math.Between(1, 3)/2 : Phaser.Math.Between(1, 2)/2;
+        enemy.speed = isMiniBoss ? Phaser.Math.Between(2, 3) : Phaser.Math.Between(1, 2);
         enemy.word = this.getRandomWord(isMiniBoss);
         enemy.isHard = isMiniBoss; // Property to help define different game logic for mini bosses outside the scope of this function
 

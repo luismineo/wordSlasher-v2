@@ -6,10 +6,12 @@ export default class MainMenu extends Phaser.Scene {
     preload() {
         this.load.image('background', 'assets/old/background.png');
         this.load.image('town', 'assets/levels/night_town.png');
+        this.load.image('keyboard', 'assets/keyboard/keyboard.png')
 
         this.load.once('complete', () => {
             this.textures.get('background').setFilter(Phaser.Textures.FilterMode.NEAREST);
             this.textures.get('town').setFilter(Phaser.Textures.FilterMode.NEAREST);
+            this.textures.get('keyboard').setFilter(Phaser.Textures.FilterMode.NEAREST);
         })
     }
 
@@ -32,7 +34,12 @@ export default class MainMenu extends Phaser.Scene {
                                         this.showHowToPlay();
                                     });
 
-        [play, howToPlay].forEach(button => {
+        const keyboardInfo = this.add.text(640, 650, 'Como usar o teclado', { fontSize: '32px', fontFamily: 'hexe', fill: '#fff' })
+                                    .setOrigin(0.5).setInteractive({useHandCursor: true}).on('pointerdown', () => {
+                                        this.showKeyboard();
+                                    });
+
+        [play, howToPlay, keyboardInfo].forEach(button => {
                 button.on('pointerover', () => button.setStyle({fill: '#ff0000'}));
                 button.on('pointerout', () => button.setStyle({fill: '#fff'}));
             });
@@ -48,7 +55,7 @@ export default class MainMenu extends Phaser.Scene {
     }
 
     showHowToPlay() {
-        const howToPlayText = 'Digite as palavras acima dos inimigos para destrui-los.\n'
+        const howToPlayText = 'Digite as palavras acima dos inimigos para os destruir.\n'
                             + 'Detenha-os de chegar ao seu cristal!'
 
         const returnMenuText = 'Pressione qualquer tecla para voltar ao menu';
@@ -65,6 +72,32 @@ export default class MainMenu extends Phaser.Scene {
 
         this.input.keyboard.once('keydown', () => {
             graphics.destroy();
+            content.destroy();
+            returnMenu.destroy();
+        });
+    }
+
+    showKeyboard(){
+        const howToUseText = 'Posicione os dedos da mao esquerda nas teclas a s d f \n'
+                            + 'E os dedos da mao direita nas teclas j k l ;'
+
+        const returnMenuText = 'Pressione qualquer tecla para voltar ao menu';
+
+        const graphics = this.add.graphics();
+        graphics.fillStyle(0x000000, 0.75);
+        graphics.fillRect(0, 0, 1280, 720);
+
+        const content = this.add.text(640, 500, howToUseText, { fontSize: '64px',fontFamily: 'hexe', fill: '#fff', align: 'center' })
+            .setOrigin(0.5);
+
+        const returnMenu = this.add.text(640, 600, returnMenuText, { fontSize: '32px', fontFamily: 'hexe', fill: '#fff' })
+            .setOrigin(0.5);
+
+        const keyboard = this.add.sprite(640, 250, 'keyboard').setScale(4).setOrigin(0.5);
+
+        this.input.keyboard.once('keydown', () => {
+            graphics.destroy();
+            keyboard.destroy();
             content.destroy();
             returnMenu.destroy();
         });
