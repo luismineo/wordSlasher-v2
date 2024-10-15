@@ -1,4 +1,4 @@
-import '../style.css'
+import '../styleGame.css'
 import Phaser, { CANVAS } from 'phaser'
 import GameScene from './scenes/GameScene'
 import MainMenu from './scenes/MainMenu'

@@ -1,5 +1,4 @@
 body {
-  background-image: url('/public/assets/home/background-image2.png');
   margin: 0;
   height: 100vh;
   display: flex;
@@ -8,10 +7,12 @@ body {
 }
 
 main {
+  background-image: url('/public/assets/home/background-image2.png');
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 
@@ -20,15 +21,15 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: rgba(33, 11, 11, 0.877);
+  background-color: rgba(67, 25, 25, 0.692);
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 15px;
   margin: 20px;
 }
 
 .content {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -44,38 +45,41 @@ main {
 
 .unifil h2 {
   color: white;
+  font-family: dotgothic;
 }
 
 .logo-worldSlasher {
-  width: 200px;
+  width: 700px;
 }
 
 
-.title {
-  color: red;
-  font-size: 3rem;
-  text-align: center;
-}
-
-.title h3 {
+.content h3 {
   color: white;
   font-size: 2rem;
   text-align: center;
+  font-family: dotgothic;
 }
 
 .button-link {
   text-decoration: none;
   border: none;
-  color: white;
   /* cor da escrita */
+  color: white;
+  font-family: dotgothic;
+  font-size: 2rem;
 
 }
 
 button {
-  background-color: green;
+  background-color: red;
   text-decoration: none;
   border: none;
   padding: 15px 25px;
   border-radius: 15px;
   font-size: 2rem;
+}
+
+@font-face {
+  font-family: dotgothic;
+  src: url("assets/fonts/zai_TributeToCaselli'sPantelegraph.ttf");
 }
