@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import MainMenu from './MainMenu';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {

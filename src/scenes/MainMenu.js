@@ -4,7 +4,7 @@ export default class MainMenu extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('background', 'assets/old/background.png');
+        this.load.image('background', 'public/assets/old/background.png');
         this.load.image('town', 'assets/levels/night_town.png');
         this.load.image('keyboard', 'assets/keyboard/keyboard.png')
 
@@ -25,24 +25,24 @@ export default class MainMenu extends Phaser.Scene {
         this.mainTex2 = this.add.text(640, 280, 'S l a s h e r', { fontSize: '128px', fontFamily: 'hexe', fill: '#ff0000' }).setOrigin(0.5);
 
         const play = this.add.text(640, 530, 'Iniciar o jogo', { fontSize: '64px', fontFamily: 'hexe', fill: '#fff' }).setOrigin(0.5)
-                                    .setInteractive({useHandCursor: true}).on('pointerdown', () => {
-                                        this.cameras.main.fadeOut(500, 0, 0, 0)
-                                        });
+            .setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+                this.cameras.main.fadeOut(500, 0, 0, 0)
+            });
 
         const howToPlay = this.add.text(640, 600, 'Como jogar', { fontSize: '64px', fontFamily: 'hexe', fill: '#fff' })
-                                    .setOrigin(0.5).setInteractive({useHandCursor: true}).on('pointerdown', () => {
-                                        this.showHowToPlay();
-                                    });
+            .setOrigin(0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+                this.showHowToPlay();
+            });
 
         const keyboardInfo = this.add.text(640, 650, 'Como usar o teclado', { fontSize: '32px', fontFamily: 'hexe', fill: '#fff' })
-                                    .setOrigin(0.5).setInteractive({useHandCursor: true}).on('pointerdown', () => {
-                                        this.showKeyboard();
-                                    });
+            .setOrigin(0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+                this.showKeyboard();
+            });
 
         [play, howToPlay, keyboardInfo].forEach(button => {
-                button.on('pointerover', () => button.setStyle({fill: '#ff0000'}));
-                button.on('pointerout', () => button.setStyle({fill: '#fff'}));
-            });
+            button.on('pointerover', () => button.setStyle({ fill: '#ff0000' }));
+            button.on('pointerout', () => button.setStyle({ fill: '#fff' }));
+        });
 
         this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
             this.scene.start('GameScene');
@@ -56,7 +56,7 @@ export default class MainMenu extends Phaser.Scene {
 
     showHowToPlay() {
         const howToPlayText = 'Digite as palavras acima dos inimigos para os destruir.\n'
-                            + 'Detenha-os de chegar ao seu cristal!'
+            + 'Detenha-os de chegar ao seu cristal!'
 
         const returnMenuText = 'Pressione qualquer tecla para voltar ao menu';
 
@@ -64,7 +64,7 @@ export default class MainMenu extends Phaser.Scene {
         graphics.fillStyle(0x000000, 0.75);
         graphics.fillRect(0, 0, 1280, 720);
 
-        const content = this.add.text(640, 300, howToPlayText, { fontSize: '64px',fontFamily: 'hexe', fill: '#fff', align: 'center' })
+        const content = this.add.text(640, 300, howToPlayText, { fontSize: '64px', fontFamily: 'hexe', fill: '#fff', align: 'center' })
             .setOrigin(0.5);
 
         const returnMenu = this.add.text(640, 450, returnMenuText, { fontSize: '32px', fontFamily: 'hexe', fill: '#fff' })
@@ -77,9 +77,9 @@ export default class MainMenu extends Phaser.Scene {
         });
     }
 
-    showKeyboard(){
+    showKeyboard() {
         const howToUseText = 'Posicione os dedos da mao esquerda nas teclas a s d f \n'
-                            + 'E os dedos da mao direita nas teclas j k l ;'
+            + 'E os dedos da mao direita nas teclas j k l ;'
 
         const returnMenuText = 'Pressione qualquer tecla para voltar ao menu';
 
@@ -87,7 +87,7 @@ export default class MainMenu extends Phaser.Scene {
         graphics.fillStyle(0x000000, 0.75);
         graphics.fillRect(0, 0, 1280, 720);
 
-        const content = this.add.text(640, 500, howToUseText, { fontSize: '64px',fontFamily: 'hexe', fill: '#fff', align: 'center' })
+        const content = this.add.text(640, 500, howToUseText, { fontSize: '64px', fontFamily: 'hexe', fill: '#fff', align: 'center' })
             .setOrigin(0.5);
 
         const returnMenu = this.add.text(640, 600, returnMenuText, { fontSize: '32px', fontFamily: 'hexe', fill: '#fff' })
