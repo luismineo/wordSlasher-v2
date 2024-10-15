@@ -1,0 +1,81 @@
+body {
+    background-image: url('/public/assets/home/background-image2.png');
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(33, 11, 11, 0.877);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.unifil {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.unifil h2 {
+    color: white;
+}
+
+.logo-worldSlasher {
+    width: 200px;
+}
+
+
+.title {
+    color: red;
+    font-size: 3rem;
+    text-align: center;
+}
+
+.title h3 {
+    color: white;
+    font-size: 2rem;
+    text-align: center;
+}
+
+.button-link {
+    text-decoration: none;
+    border: none;
+    color: white;
+    /* cor da escrita */
+
+}
+
+button {
+    background-color: green;
+    text-decoration: none;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 15px;
+    font-size: 2rem;
+}
