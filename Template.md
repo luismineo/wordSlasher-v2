@@ -1,17 +1,15 @@
 ---
-title: "Nome do projeto"
+title: "WordSlasher"
 draft: false
 language: pt-br
-featured_image: images/featured/featured-img-placeholder.png 
-summary: Sumário de seu projeto
+featured_image: logotextWS.png 
+summary: Domine o teclado, vença o relógio!
 author: Unifil
 categories: Blog
-tags: ["CC", "ES", "ADS", "IA", "Educação", "Tecnologia", "Ciência", "Saúde", "Cultura", "Entretenimento"] 
-linkandroid: link  de download do aplicativo em android
-linkios: link de download aplicativo em ios
-linkweb: link de acesso de aplicativo web
-linkblog: Link do blog
-linkvideo: Link do video
+tags: ["CC","Jogo" , "Educação", "Tecnologia","Entretenimento"] 
+linkweb: http://167.234.225.248/
+linkblog: https://wordslasher.blogspot.com/
+linkvideo: https://wordslasher.blogspot.com/2024/03/apresentacao-do-projeto-em-video.html
 
 ---
 
@@ -261,3 +259,4 @@ It converts "HTML", but keep intact partial entries like "xxxHTMLyyy" and so on.
 ::: warning
 *here be dragons*
 :::
+
