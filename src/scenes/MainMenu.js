@@ -4,6 +4,11 @@ export default class MainMenu extends Phaser.Scene {
     }
 
     preload() {
+        this.loadFont("hexenaat", "assets/fonts/Hexenaat2.ttf");
+        this.loadFont("dotgothic", "assets/fonts/DotGothic16-Regular.ttf");
+        this.loadFont("vt323", "assets/fonts/VT323-Regular.ttf");
+        this.loadFont("zai", "assets/fonts/zai_TributeToCaselli'sPantelegraph.ttf");
+
         this.load.image('background', 'public/assets/old/background.png');
         this.load.image('town', 'assets/levels/night_town.png');
         this.load.image('keyboard', 'assets/keyboard/keyboard.png')
@@ -21,20 +26,20 @@ export default class MainMenu extends Phaser.Scene {
         background.displayWidth = 1280;
         background.displayHeight = 720;
 
-        this.mainTex = this.add.text(640, 150, 'W o r d', { fontSize: '128px', fontFamily: 'hexe', fill: '#fff' }).setOrigin(0.5);
-        this.mainTex2 = this.add.text(640, 280, 'S l a s h e r', { fontSize: '128px', fontFamily: 'hexe', fill: '#ff0000' }).setOrigin(0.5);
+        this.mainTex = this.add.text(640, 150, 'W o r d', { fontSize: '128px', fontFamily: 'hexenaat', fill: '#fff' }).setOrigin(0.5);
+        this.mainTex2 = this.add.text(640, 280, 'S l a s h e r', { fontSize: '128px', fontFamily: 'hexenaat', fill: '#ff0000' }).setOrigin(0.5);
 
-        const play = this.add.text(640, 530, 'Iniciar o jogo', { fontSize: '64px', fontFamily: 'hexe', fill: '#fff' }).setOrigin(0.5)
+        const play = this.add.text(640, 530, 'Iniciar o jogo', { fontSize: '64px', fontFamily: 'hexenaat', fill: '#fff' }).setOrigin(0.5)
             .setInteractive({ useHandCursor: true }).on('pointerdown', () => {
                 this.cameras.main.fadeOut(500, 0, 0, 0)
             });
 
-        const howToPlay = this.add.text(640, 600, 'Como jogar', { fontSize: '64px', fontFamily: 'hexe', fill: '#fff' })
+        const howToPlay = this.add.text(640, 600, 'Como jogar', { fontSize: '64px', fontFamily: 'hexenaat', fill: '#fff' })
             .setOrigin(0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => {
                 this.showHowToPlay();
             });
 
-        const keyboardInfo = this.add.text(640, 650, 'Como usar o teclado', { fontSize: '32px', fontFamily: 'hexe', fill: '#fff' })
+        const keyboardInfo = this.add.text(640, 650, 'Como usar o teclado', { fontSize: '32px', fontFamily: 'hexenaat', fill: '#fff' })
             .setOrigin(0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => {
                 this.showKeyboard();
             });
@@ -64,10 +69,10 @@ export default class MainMenu extends Phaser.Scene {
         graphics.fillStyle(0x000000, 0.75);
         graphics.fillRect(0, 0, 1280, 720);
 
-        const content = this.add.text(640, 300, howToPlayText, { fontSize: '64px', fontFamily: 'hexe', fill: '#fff', align: 'center' })
+        const content = this.add.text(640, 300, howToPlayText, { fontSize: '64px', fontFamily: 'hexenaat', fill: '#fff', align: 'center' })
             .setOrigin(0.5);
 
-        const returnMenu = this.add.text(640, 450, returnMenuText, { fontSize: '32px', fontFamily: 'hexe', fill: '#fff' })
+        const returnMenu = this.add.text(640, 450, returnMenuText, { fontSize: '32px', fontFamily: 'hexenaat', fill: '#fff' })
             .setOrigin(0.5);
 
         this.input.keyboard.once('keydown', () => {
@@ -87,10 +92,10 @@ export default class MainMenu extends Phaser.Scene {
         graphics.fillStyle(0x000000, 0.75);
         graphics.fillRect(0, 0, 1280, 720);
 
-        const content = this.add.text(640, 500, howToUseText, { fontSize: '64px', fontFamily: 'hexe', fill: '#fff', align: 'center' })
+        const content = this.add.text(640, 500, howToUseText, { fontSize: '64px', fontFamily: 'hexenaat', fill: '#fff', align: 'center' })
             .setOrigin(0.5);
 
-        const returnMenu = this.add.text(640, 600, returnMenuText, { fontSize: '32px', fontFamily: 'hexe', fill: '#fff' })
+        const returnMenu = this.add.text(640, 600, returnMenuText, { fontSize: '32px', fontFamily: 'hexenaat', fill: '#fff' })
             .setOrigin(0.5);
 
         const keyboard = this.add.sprite(640, 250, 'keyboard').setScale(4).setOrigin(0.5);
@@ -100,6 +105,15 @@ export default class MainMenu extends Phaser.Scene {
             keyboard.destroy();
             content.destroy();
             returnMenu.destroy();
+        });
+    }
+
+    loadFont(name, url) {
+        var newFont = new FontFace(name, `url(${url})`);
+        newFont.load().then(function (loaded) {
+            document.fonts.add(loaded);
+        }).catch(function (error) {
+            return error;
         });
     }
 }
